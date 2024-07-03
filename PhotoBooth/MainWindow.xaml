@@ -5,72 +5,73 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PhotoBooth"
         mc:Ignorable="d"
-        Title="PhotoBooth" Height="800" Width="1000" WindowStartupLocation="CenterScreen" KeyDown="Window_KeyDown">
+        Title="PhotoBooth" Width="1920" Height="1080" WindowStartupLocation="CenterScreen" KeyDown="Window_KeyDown" WindowStyle="None" WindowState="Maximized">
 
-    <DockPanel Width="950" Height="750">
-        <TabControl x:Name="tcMainTabs" BorderThickness="0">
-            <TabItem Header="Start Tab" Visibility="Collapsed">
-                <StackPanel Orientation="Vertical" Margin="0,100">
-                    <Label FontSize="64" HorizontalContentAlignment="Center">Click the Start button to begin!</Label>
-
-                    <Button x:Name="btnStartPictures" Width="300" Height="100" FontSize="64" FontWeight="Bold" Margin="0,100,0,0" Click="btnStartPictures_Click">Start</Button>
-                </StackPanel>
-            </TabItem>
-
-            <TabItem Header="Capture Tab" Visibility="Collapsed">
-                <StackPanel Orientation="Vertical">
-                    <Label FontSize="64" HorizontalContentAlignment="Center">Smile! Next picture in...</Label>
-                    <Label x:Name="lblCountdown" FontSize="128" FontWeight="Black" HorizontalAlignment="Center">5</Label>
-
-                    <!--Images displayed-->
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,100,0,0">
-                        <Border BorderBrush="Black" BorderThickness="5" Margin="25">
-                            <Image x:Name="imgCaptOne" Width="200" Height="150" Stretch="Fill"/>
-                        </Border>
-                        <Border BorderBrush="Black" BorderThickness="5" Margin="25">
-                            <Image x:Name="imgCaptTwo" Width="200" Height="150" Stretch="Fill"/>
-                        </Border>
-                        <Border BorderBrush="Black" BorderThickness="5" Margin="25">
-                            <Image x:Name="imgCaptThree" Width="200" Height="150" Stretch="Fill"/>
-                        </Border>
+    <DockPanel>
+        <Border Style="{StaticResource outline}">
+            <TabControl x:Name="tcMainTabs" BorderThickness="0">
+                <TabItem Header="Start Tab" Visibility="Collapsed">
+                    <StackPanel Orientation="Vertical" Margin="0,100" VerticalAlignment="Center">
+                        <TextBlock Style="{StaticResource lblHeader}">Let's take some pictures!</TextBlock>
+                        <Button x:Name="btnStartPictures" Style="{StaticResource btnRounded}" Width="400" Margin="0,100,0,0" Click="btnStartPictures_Click">Start</Button>
                     </StackPanel>
-                </StackPanel>
-            </TabItem>
+                </TabItem>
 
-            <TabItem Header="Results Tab" Visibility="Collapsed">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TabItem Header="Capture Tab" Visibility="Collapsed">
                     <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                        <Border BorderBrush="Black" BorderThickness="5" Margin="25">
-                            <Image x:Name="imgResOne" Width="200" Height="150" Stretch="Fill"/>
-                        </Border>
-                        <Border BorderBrush="Black" BorderThickness="5" Margin="25">
-                            <Image x:Name="imgResTwo" Width="200" Height="150" Stretch="Fill"/>
-                        </Border>
-                        <Border BorderBrush="Black" BorderThickness="5" Margin="25">
-                            <Image x:Name="imgResThree" Width="200" Height="150" Stretch="Fill"/>
-                        </Border>
-                    </StackPanel>
-                    <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="100,0,0,0">
-                        <Label FontSize="32">How many prints do you need?</Label>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Button x:Name="btnDecreasePrints" Width="100" Height="100" FontSize="64" FontWeight="Black" Click="btnDecreasePrints_Click">-</Button>
-                            <Label x:Name="lblNumPrints" FontSize="64" Width="100" HorizontalContentAlignment="Center">1</Label>
-                            <Button x:Name="btnIncreasePrints" Width="100" Height="100" FontSize="64" FontWeight="Black" Click="btnIncreasePrints_Click">+</Button>
+                        <TextBlock Style="{StaticResource lblHeader}" Margin="0,100,0,0">Smile! Next picture in...</TextBlock>
+                        <Label x:Name="lblCountdown" Style="{StaticResource lblNumber}">5</Label>
+
+                        <!--Images displayed-->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,75,0,0">
+                            <Border Style="{StaticResource imgRotate10}" Margin="75">
+                                <Image x:Name="imgCaptOne" Width="400" Height="300" Stretch="Fill"/>
+                            </Border>
+                            <Border Style="{StaticResource imgRotate5}" Margin="75">
+                                <Image x:Name="imgCaptTwo" Width="400" Height="300" Stretch="Fill"/>
+                            </Border>
+                            <Border Style="{StaticResource imgRotate2}" Margin="75">
+                                <Image x:Name="imgCaptThree" Width="400" Height="300" Stretch="Fill"/>
+                            </Border>
                         </StackPanel>
-                        
-                        <Button x:Name="btnPrint" FontSize="64" FontWeight="Bold" Width="300" Margin="0,100,0,0">Print</Button>
                     </StackPanel>
+                </TabItem>
 
-                </StackPanel>
-            </TabItem>
+                <TabItem Header="Results Tab" Visibility="Collapsed">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                            <Border BorderBrush="Black" BorderThickness="5" Margin="25">
+                                <Image x:Name="imgResOne" Width="266" Height="200" Stretch="Fill"/>
+                            </Border>
+                            <Border BorderBrush="Black" BorderThickness="5" Margin="25">
+                                <Image x:Name="imgResTwo" Width="266" Height="200" Stretch="Fill"/>
+                            </Border>
+                            <Border BorderBrush="Black" BorderThickness="5" Margin="25">
+                                <Image x:Name="imgResThree" Width="266" Height="200" Stretch="Fill"/>
+                            </Border>
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="100,0,0,0">
+                            <TextBlock Style="{StaticResource lblHeader}" Width="750">How many prints do you need?</TextBlock>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button x:Name="btnDecreasePrints" Width="100" Height="100" Style="{StaticResource btnRounded}" Click="btnDecreasePrints_Click">-</Button>
+                                <Label x:Name="lblNumPrints" Style="{StaticResource lblNumber}" FontSize="128" Width="100" HorizontalContentAlignment="Center">1</Label>
+                                <Button x:Name="btnIncreasePrints" Width="100" Height="100" Style="{StaticResource btnRounded}" Click="btnIncreasePrints_Click">+</Button>
+                            </StackPanel>
 
-            <TabItem Header="Settings Tab" Visibility="Collapsed">
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <Label FontSize="32">Delay between pictures: </Label>
-                    <TextBox x:Name="tbPicDelay" Width="100" FontSize="32" Margin="25,0"/>
-                    <Button x:Name="btnSetDelay" Width="100" FontSize="32" Click="btnSetDelay_Click">Save</Button>
-                </StackPanel>
-            </TabItem>
-        </TabControl>
+                            <Button x:Name="btnPrint" Style="{StaticResource btnRounded}"  Width="400" Margin="0,100,0,0">Print</Button>
+                        </StackPanel>
+
+                    </StackPanel>
+                </TabItem>
+
+                <TabItem Header="Settings Tab" Visibility="Collapsed">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Label FontSize="32">Delay between pictures:</Label>
+                        <TextBox x:Name="tbPicDelay" Width="100" FontSize="32" Margin="25,0"/>
+                        <Button x:Name="btnSetDelay" Width="100" FontSize="32" Click="btnSetDelay_Click">Save</Button>
+                    </StackPanel>
+                </TabItem>
+            </TabControl>
+        </Border>
     </DockPanel>
 </Window>

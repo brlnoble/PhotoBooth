@@ -276,5 +276,20 @@ namespace PhotoBooth
                 tbPicDelay.Text = picture_delay.ToString();
             }
         }
+
+        /*private BitmapImage CombineImages(BitmapImage[] images)
+        {
+            int width = (int)images[0].Width; //Assume all the same width
+            int height = (int)images.Sum(i => i.Height); //Combine the height of all of them
+
+            Bitmap bitmap = new Bitmap(width, height);
+            using (Graphics g = Graphics.FromImage(bitmap))
+            {
+                g.DrawImage(images[0], 0, 0);
+                g.DrawImage(images[2], image1.Width, 0);
+            }
+
+            return bitmap;
+        }*/
     }
 }
