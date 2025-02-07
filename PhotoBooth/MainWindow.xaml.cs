@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -18,6 +19,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Emgu.CV;
 using Emgu.Util;
+using static System.Net.Mime.MediaTypeNames;
 using Image = System.Windows.Controls.Image;
 
 namespace PhotoBooth
@@ -75,17 +77,31 @@ namespace PhotoBooth
         int num_of_pictures = 3;
 
         /// <summary>
+        /// Number of frames per second to display in live feed
+        /// </summary>
+        int display_fps = 8;
+
+        /// <summary>
+        /// Camera index to use
+        /// </summary>
+        int display_camera = 0;
+
+        /// <summary>
         /// Number of pictures to print
         /// </summary>
         int num_prints = 1;
 
         VideoCapture camera;
 
+        System.Drawing.Size displaySize = new System.Drawing.Size(712, 480);
+
         public MainWindow()
         {
             InitializeComponent();
 
             tbPicDelay.Text = picture_delay.ToString();
+            tbDisplayFps.Text = display_fps.ToString();
+            tbCameraIndex.Text = display_camera.ToString();
 
             //Setup the array of Image boxes on the capture screen
             captBoxes = new Image[]
@@ -94,14 +110,6 @@ namespace PhotoBooth
                 imgCaptTwo,
                 imgCaptThree,
             };
-
-            //Setup camera
-            camera = new VideoCapture(1); //, VideoCapture.API.DShow
-            camera.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth, 1920);
-            camera.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight, 1080);
-
-            //camera.Set(Emgu.CV.CvEnum.CapProp.FrameWidth, 1920);
-            //camera.Set(Emgu.CV.CvEnum.CapProp.FrameHeight, 1080);
         }
 
         /// <summary>
@@ -111,6 +119,11 @@ namespace PhotoBooth
         /// <param name="e"></param>
         private void btnStartPictures_Click(object sender, RoutedEventArgs e)
         {
+            //Setup camera
+            camera = new VideoCapture(display_camera); //, VideoCapture.API.DShow
+            camera.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth, 1920);
+            camera.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight, 1080);
+
             //Change to capture screen
             tcMainTabs.SelectedIndex = (int)eTab.capture;
 
@@ -154,17 +167,17 @@ namespace PhotoBooth
         /// <param name="e"></param>
         private void BgCapture_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            if(e.ProgressPercentage == 100)
+            if(e.ProgressPercentage == -1)
             {
                 lblCountdown.Content = "Finished!";
             }
-            else if (e.ProgressPercentage / 4 < 1.0)
+            else if (e.ProgressPercentage / display_fps < 1.0)
             {
                 lblCountdown.Content = "Smile!";
             }
             else
             {
-                lblCountdown.Content = (e.ProgressPercentage / 4).ToString();
+                lblCountdown.Content = (e.ProgressPercentage / display_fps).ToString();
             }
             
 
@@ -200,13 +213,14 @@ namespace PhotoBooth
             //Take 3 pictures
             while(num_pics < num_of_pictures)
             {
-                timer = (picture_delay + 1) * 4 -1; //Reset timer
+                timer = (picture_delay + 1) * display_fps - 1; //Reset timer
 
                 //Report timer, do not display image
                 bgCapture.ReportProgress(timer, null);
 
                 Mat frame = new Mat();
                 Bitmap img = null;
+                Bitmap imgSmall = null;
 
                 //Delay between picture
                 while(timer > 0)
@@ -214,13 +228,14 @@ namespace PhotoBooth
                     timer--; //Decrease timer
                     Console.WriteLine(timer);
 
-                    Thread.Sleep(250); //Delay
+                    Thread.Sleep(1000 / display_fps); //Delay
 
                     if(camera.Retrieve(frame)) 
                     {
                         //Display frame on interface, do not save
                         img = frame.ToBitmap();
-                        Photo mainDisplay = new Photo(-1, img);
+                        imgSmall = new Bitmap(img, displaySize);
+                        Photo mainDisplay = new Photo(-1, imgSmall);
                         bgCapture.ReportProgress(timer, mainDisplay);
                     }
                     else
@@ -237,10 +252,11 @@ namespace PhotoBooth
 
                 num_pics++; //Picture taken, continue
 
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
             }
 
-            bgCapture.ReportProgress(100, null);
+            bgCapture.ReportProgress(-1, null);
+            Thread.Sleep(1000);
         }
 
         /// <summary>
@@ -293,13 +309,14 @@ namespace PhotoBooth
         }
 
         /// <summary>
-        /// Change the delay on the settings screen
+        /// Apply the values on the settings screen
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void btnSetDelay_Click(object sender, RoutedEventArgs e)
+        private void btnSave_Click(object sender, RoutedEventArgs e)
         {
             int new_delay;
+            int new_fps;
 
             if(int.TryParse(tbPicDelay.Text, out new_delay))
             {
@@ -309,6 +326,73 @@ namespace PhotoBooth
             {
                 tbPicDelay.Text = picture_delay.ToString();
             }
+
+            if (int.TryParse(tbDisplayFps.Text, out new_fps))
+            {
+                display_fps = new_fps;
+            }
+            else
+            {
+                tbDisplayFps.Text = display_fps.ToString();
+            }
+        }
+
+        private void btnTestCamera_Click(object sender, RoutedEventArgs e)
+        {
+            Mat frame = new Mat();
+            BitmapImage img = new BitmapImage();
+
+            imgCaptTest.Source = null;
+
+            int cameraIndex = 0;
+
+            if(int.TryParse(tbCameraIndex.Text, out cameraIndex))
+            {
+                try
+                {
+                    //Setup camera
+                    VideoCapture cameraTest = new VideoCapture(cameraIndex); //, VideoCapture.API.DShow
+
+                    cameraTest.Start();
+
+                    //Wait for camera to initialize
+                    Thread.Sleep(5000);
+
+                    if (cameraTest.Retrieve(frame))
+                    {
+                        if (frame.ToBitmap() != null)
+                        {
+                            using (var memory = new MemoryStream())
+                            {
+                                frame.ToBitmap().Save(memory, ImageFormat.Png);
+                                memory.Position = 0;
+
+                                var bitmapImage = new BitmapImage();
+                                bitmapImage.BeginInit();
+                                bitmapImage.StreamSource = memory;
+                                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                                bitmapImage.EndInit();
+                                bitmapImage.Freeze();
+
+                                img = bitmapImage;
+                            }
+
+                            imgCaptTest.Source = img;
+                        }
+                    }
+
+                    cameraTest.Stop();
+                    cameraTest.Dispose();
+
+                    display_camera = cameraIndex;
+                }
+                catch { }
+            }
+            else
+            {
+                tbCameraIndex.Text = display_camera.ToString();
+            }
+
         }
 
         /*private BitmapImage CombineImages(BitmapImage[] images)

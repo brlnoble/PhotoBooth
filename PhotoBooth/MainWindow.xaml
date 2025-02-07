@@ -35,7 +35,7 @@
                             <!--<TextBlock Style="{StaticResource lblHeader}">Smile! Next picture in...</TextBlock>-->
                             <Label x:Name="lblCountdown" Style="{StaticResource lblNumber}">5</Label>
                             <Border Style="{StaticResource outline}" HorizontalAlignment="Center">
-                                <Image x:Name="imgCaptMain" Width="712" Height="400" Stretch="Fill"/>
+                                <Image x:Name="imgCaptMain" Width="889" Height="500" Stretch="Fill"/>
                             </Border>
                         </StackPanel>
                     </StackPanel>
@@ -69,10 +69,24 @@
                 </TabItem>
 
                 <TabItem Header="Settings Tab" Visibility="Collapsed">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <Label FontSize="32">Delay between pictures:</Label>
-                        <TextBox x:Name="tbPicDelay" Width="100" FontSize="32" Margin="25,0"/>
-                        <Button x:Name="btnSetDelay" Width="100" FontSize="32" Click="btnSetDelay_Click">Save</Button>
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <Label FontSize="32">Delay between pictures:</Label>
+                            <TextBox x:Name="tbPicDelay" Width="100" FontSize="32" Margin="25,0"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label FontSize="32">Live display FPS</Label>
+                            <TextBox x:Name="tbDisplayFps" Width="100" FontSize="32" Margin="25,0"/>
+                        </StackPanel>
+                        <Button x:Name="btnSave" Width="200" FontSize="64" Margin="100" Click="btnSave_Click">Save</Button>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button x:Name="btnTestCamera" Width="100" FontSize="32" Click="btnTestCamera_Click">Test</Button>
+                            <TextBox x:Name="tbCameraIndex" Width="100" FontSize="32" Margin="25, 0"/>
+                        </StackPanel>
+                        <Border Style="{StaticResource outline}" HorizontalAlignment="Center">
+                            <Image x:Name="imgCaptTest" Width="356" Height="200" Stretch="Fill"/>
+                        </Border>
                     </StackPanel>
                 </TabItem>
             </TabControl>
