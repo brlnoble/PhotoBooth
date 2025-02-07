@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Emgu.CV;
+using Emgu.Util;
+using Image = System.Windows.Controls.Image;
 
 namespace PhotoBooth
 {
@@ -42,7 +46,7 @@ namespace PhotoBooth
         /// <summary>
         /// Custom object with index and image
         /// </summary>
-        Photo[] images;
+        BitmapImage[] images;
 
         /// <summary>
         /// Capture boxes
@@ -75,6 +79,8 @@ namespace PhotoBooth
         /// </summary>
         int num_prints = 1;
 
+        VideoCapture camera;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -88,6 +94,14 @@ namespace PhotoBooth
                 imgCaptTwo,
                 imgCaptThree,
             };
+
+            //Setup camera
+            camera = new VideoCapture(1); //, VideoCapture.API.DShow
+            camera.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameWidth, 1920);
+            camera.SetCaptureProperty(Emgu.CV.CvEnum.CapProp.FrameHeight, 1080);
+
+            //camera.Set(Emgu.CV.CvEnum.CapProp.FrameWidth, 1920);
+            //camera.Set(Emgu.CV.CvEnum.CapProp.FrameHeight, 1080);
         }
 
         /// <summary>
@@ -107,15 +121,10 @@ namespace PhotoBooth
             bgCapture.ProgressChanged += BgCapture_ProgressChanged;
             bgCapture.RunWorkerCompleted += BgCapture_RunWorkerCompleted;
 
-            images = new Photo[num_of_pictures];
-
-            //Clear all currently displayed images
-            for (int i = 0; i< num_of_pictures; i++)
-            {
-                captBoxes[i].Source = new BitmapImage(new Uri(test_pics[3]));
-            }
+            images = new BitmapImage[num_of_pictures];
 
             //Start countdown and capture
+            camera.Start();
             bgCapture.RunWorkerAsync();
         }
 
@@ -126,14 +135,16 @@ namespace PhotoBooth
         /// <param name="e"></param>
         private void BgCapture_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            tcMainTabs.SelectedIndex = (int)eTab.results;
+            camera.Stop();
 
-            imgResOne.Source = images[0].Image;
-            imgResTwo.Source = images[1].Image;
-            imgResThree.Source = images[2].Image;
+            tcMainTabs.SelectedIndex = (int)eTab.results;
 
             num_prints = 1;
             lblNumPrints.Content = num_prints;
+
+            imgResOne.Source = images[0];
+            imgResTwo.Source = images[1];
+            imgResThree.Source = images[2];
         }
 
         /// <summary>
@@ -143,26 +154,35 @@ namespace PhotoBooth
         /// <param name="e"></param>
         private void BgCapture_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            switch(e.ProgressPercentage.ToString())
+            if(e.ProgressPercentage == 100)
             {
-                case "0":
-                    lblCountdown.Content = "Smile!";
-                    break;
-                case "100":
-                    lblCountdown.Content = "Finished!";
-                    break;
-                default:
-                    lblCountdown.Content = e.ProgressPercentage.ToString();
-                    break;
+                lblCountdown.Content = "Finished!";
             }
+            else if (e.ProgressPercentage / 4 < 1.0)
+            {
+                lblCountdown.Content = "Smile!";
+            }
+            else
+            {
+                lblCountdown.Content = (e.ProgressPercentage / 4).ToString();
+            }
+            
 
             //Convert to Photo object to check if picture was taken
             Photo result = e.UserState as Photo;
 
             if(result != null)
             {
-                //Display the image
-                captBoxes[result.Index].Source = result.Image;
+                if(result.Index == -1)
+                {
+                    imgCaptMain.Source = result.Image.Clone();
+                }
+                else
+                {
+                    //Display the image
+                    images[result.Index] = result.Image.Clone();
+                    captBoxes[result.Index].Source = result.Image.Clone();
+                }
             }
         }
 
@@ -180,27 +200,41 @@ namespace PhotoBooth
             //Take 3 pictures
             while(num_pics < num_of_pictures)
             {
-                timer = picture_delay; //Reset timer
+                timer = (picture_delay + 1) * 4 -1; //Reset timer
 
                 //Report timer, do not display image
                 bgCapture.ReportProgress(timer, null);
+
+                Mat frame = new Mat();
+                Bitmap img = null;
 
                 //Delay between picture
                 while(timer > 0)
                 {
                     timer--; //Decrease timer
+                    Console.WriteLine(timer);
 
-                    Thread.Sleep(1000); //Delay
+                    Thread.Sleep(250); //Delay
 
-                    //Report timer, do not display image
-                    bgCapture.ReportProgress(timer, null);
+                    if(camera.Retrieve(frame)) 
+                    {
+                        //Display frame on interface, do not save
+                        img = frame.ToBitmap();
+                        Photo mainDisplay = new Photo(-1, img);
+                        bgCapture.ReportProgress(timer, mainDisplay);
+                    }
+                    else
+                    {
+                        //Report timer, do not display image
+                        bgCapture.ReportProgress(timer, null);
+                    }
                 }
 
                 //Capture and save photo
-                Photo result = new Photo(num_pics, new BitmapImage(new Uri(test_pics[num_pics])));
-                images[num_pics] = result;
-
+                //Photo result = new Photo(num_pics, new BitmapImage(new Uri(test_pics[num_pics])));
+                Photo result = new Photo(num_pics, img);
                 bgCapture.ReportProgress(timer, result);
+
                 num_pics++; //Picture taken, continue
 
                 Thread.Sleep(1000);

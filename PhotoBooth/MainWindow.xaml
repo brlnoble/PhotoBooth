@@ -18,20 +18,24 @@
                 </TabItem>
 
                 <TabItem Header="Capture Tab" Visibility="Collapsed">
-                    <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                        <TextBlock Style="{StaticResource lblHeader}" Margin="0,100,0,0">Smile! Next picture in...</TextBlock>
-                        <Label x:Name="lblCountdown" Style="{StaticResource lblNumber}">5</Label>
-
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <!--Images displayed-->
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,75,0,0">
-                            <Border Style="{StaticResource imgRotate10}" Margin="75">
-                                <Image x:Name="imgCaptOne" Width="400" Height="300" Stretch="Fill"/>
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="0 50">
+                            <Border Style="{StaticResource outline}" Margin="10">
+                                <Image x:Name="imgCaptOne" Width="356" Height="200" Stretch="Fill"/>
                             </Border>
-                            <Border Style="{StaticResource imgRotate5}" Margin="75">
-                                <Image x:Name="imgCaptTwo" Width="400" Height="300" Stretch="Fill"/>
+                            <Border Style="{StaticResource outline}" Margin="10">
+                                <Image x:Name="imgCaptTwo" Width="356" Height="200" Stretch="Fill"/>
                             </Border>
-                            <Border Style="{StaticResource imgRotate2}" Margin="75">
-                                <Image x:Name="imgCaptThree" Width="400" Height="300" Stretch="Fill"/>
+                            <Border Style="{StaticResource outline}" Margin="10">
+                                <Image x:Name="imgCaptThree" Width="356" Height="200" Stretch="Fill"/>
+                            </Border>
+                        </StackPanel>
+                        <StackPanel Orientation="Vertical" VerticalAlignment="Center" HorizontalAlignment="Stretch" Width="1000">
+                            <!--<TextBlock Style="{StaticResource lblHeader}">Smile! Next picture in...</TextBlock>-->
+                            <Label x:Name="lblCountdown" Style="{StaticResource lblNumber}">5</Label>
+                            <Border Style="{StaticResource outline}" HorizontalAlignment="Center">
+                                <Image x:Name="imgCaptMain" Width="712" Height="400" Stretch="Fill"/>
                             </Border>
                         </StackPanel>
                     </StackPanel>
@@ -41,13 +45,13 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                         <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                             <Border BorderBrush="Black" BorderThickness="5" Margin="25">
-                                <Image x:Name="imgResOne" Width="266" Height="200" Stretch="Fill"/>
+                                <Image x:Name="imgResOne" Width="356" Height="200" Stretch="Fill"/>
                             </Border>
                             <Border BorderBrush="Black" BorderThickness="5" Margin="25">
-                                <Image x:Name="imgResTwo" Width="266" Height="200" Stretch="Fill"/>
+                                <Image x:Name="imgResTwo" Width="356" Height="200" Stretch="Fill"/>
                             </Border>
                             <Border BorderBrush="Black" BorderThickness="5" Margin="25">
-                                <Image x:Name="imgResThree" Width="266" Height="200" Stretch="Fill"/>
+                                <Image x:Name="imgResThree" Width="356" Height="200" Stretch="Fill"/>
                             </Border>
                         </StackPanel>
                         <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="100,0,0,0">
